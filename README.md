@@ -22,7 +22,7 @@ torchvision: 0.19.0+cu124
 
 - `main`: Main loop to train agents;
 
-- `main_evaluate`: Only rendering part is retained in `main`, in order to evaluate models (a set of feasible models is provided in `tmp/maddpg/UAV Round up`;
+- `main_evaluate`: Only rendering part is retained in `main`, in order to evaluate models (a set of feasible models is provided in `tmp/maddpg/UAV_Round_up`;
 
 - `math_tool`: some math-relevent functions.
 
