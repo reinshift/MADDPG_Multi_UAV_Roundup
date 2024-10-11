@@ -26,4 +26,4 @@ torchvision: 0.19.0+cu124
 
 - `math_tool`: some math-relevent functions.
 
-<img title="" src="Roundup.png" alt="" data-align="center" width="471">
+<img title="" src="Roundup.png" alt="" data-align="center" width="470">
