@@ -1,4 +1,4 @@
-a## Key dependencies based (Lower versions are not guaranteed to be feasible):
+## Key dependencies based (Lower versions are not guaranteed to be feasible):
 
 python: 3.9.0
 
