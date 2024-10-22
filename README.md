@@ -24,6 +24,6 @@ torchvision: 0.19.0+cu124
 
 - `main_evaluate`: Only rendering part is retained in `main`, in order to evaluate models (a set of feasible models is provided in `tmp/maddpg/UAV_Round_up`;
 
-- `math_tool`: some math-relavent functions.
+- `math_tool`: some math-relevant functions.
 
 <img title="" src="Roundup.png" alt="" data-align="center" width="470">
