@@ -28,4 +28,7 @@ torchvision: 0.19.0+cu124
 
 <img title="" src="Roundup.png" alt="" data-align="center" width="470">
 
+---
+
+## Stargazers over time
 [![Stargazers over time](https://starchart.cc/reinshift/MADDPG_Multi_UAV_Roundup.svg?variant=adaptive)](https://starchart.cc/reinshift/MADDPG_Multi_UAV_Roundup)
