@@ -28,6 +28,4 @@ torchvision: 0.19.0+cu124
 
 <img title="" src="Roundup.png" alt="" data-align="center" width="470">
 
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=reinshift/MADDPG_Multi_UAV_Roundup&type=Date)](https://star-history.com/#reinshift/MADDPG_Multi_UAV_Roundup&Date)
+[![Stargazers over time](https://starchart.cc/reinshift/MADDPG_Multi_UAV_Roundup.svg?variant=adaptive)](https://starchart.cc/reinshift/MADDPG_Multi_UAV_Roundup)
