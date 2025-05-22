@@ -29,6 +29,8 @@ torchvision: 0.19.0+cu124
 <img title="" src="Roundup.png" alt="" data-align="center" width="470">
 
 ---
+## Ads
+For multi-target capture, also see [Multi-Target Capture](https://github.com/reinshift/KF_AA_MARL)
 
 ## Stargazers over time
 [![Stargazers over time](https://starchart.cc/reinshift/MADDPG_Multi_UAV_Roundup.svg?variant=adaptive)](https://starchart.cc/reinshift/MADDPG_Multi_UAV_Roundup)
