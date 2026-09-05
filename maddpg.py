@@ -65,6 +65,7 @@ class MADDPG:
             all_agents_new_actions.append(new_pi)
             old_agents_actions.append(actions[agent_idx])
 
+        # Centralized critics receive the joint action in agent-index order.
         new_actions = T.cat([acts for acts in all_agents_new_actions], dim=1)
         old_actions = T.cat([acts for acts in old_agents_actions],dim=1)
 
@@ -82,6 +83,7 @@ class MADDPG:
             agent.critic.scheduler.step()
 
             mu_states = T.tensor(actor_states[agent_idx], dtype=T.float).to(device)
+            # Replace only this agent's replay action to optimize its policy.
             oa = old_actions.clone()
             oa[:,agent_idx*self.n_actions:agent_idx*self.n_actions+self.n_actions] = agent.actor.forward(mu_states)            
             actor_loss = -T.mean(agent.critic.forward(states, oa).flatten())

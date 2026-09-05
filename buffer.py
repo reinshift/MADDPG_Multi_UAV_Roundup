@@ -44,6 +44,7 @@ class MultiAgentReplayBuffer:
         #if self.mem_cntr % self.mem_size == 0 and self.mem_cntr > 0:
         #    self.init_actor_memory()
         
+        # Reuse one ring-buffer slot for every agent and the shared critic state.
         index = self.mem_cntr % self.mem_size
 
         for agent_idx in range(self.n_agents):
@@ -58,8 +59,10 @@ class MultiAgentReplayBuffer:
         self.mem_cntr += 1
 
     def sample_buffer(self):
+        # Only sample populated slots while the buffer is still filling.
         max_mem = min(self.mem_cntr, self.mem_size)
 
+        # Shared indices keep all agents' observations and actions time-aligned.
         batch = np.random.choice(max_mem, self.batch_size, replace=False)
 
         states = self.state_memory[batch]
