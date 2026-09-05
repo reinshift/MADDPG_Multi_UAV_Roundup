@@ -1,3 +1,6 @@
+# 动画评估入口：加载模型、记录速度并展示单次围捕过程。
+# 本文件注释描述当前实现；参数限制与特殊行为以具体代码为准。
+
 from maddpg import MADDPG
 from sim_env import UAVEnv
 import numpy as np
@@ -6,9 +9,11 @@ import matplotlib.animation as animation
 import warnings
 warnings.filterwarnings('ignore')
 
+# 用长度 window_size 的均匀窗口平滑数据；valid 模式只保留完整重叠位置。
 def moving_average(data, window_size=5):
     return np.convolve(data, np.ones(window_size)/window_size, mode='valid')
 
+# 按时间绘制各智能体速率曲线；索引 3 在当前四智能体配置中标为目标。
 def plot_velocity_magnitude(time_steps, velocities_magnitude):
     plt.figure(figsize=(15, 4))  
     for i in range(len(velocities_magnitude)):
@@ -23,6 +28,7 @@ def plot_velocity_magnitude(time_steps, velocities_magnitude):
     plt.grid(True)
     plt.show()
 
+# 按时间绘制各智能体的水平速度分量。
 def plot_velocity_x(time_steps, velocities_x):
     plt.figure(figsize=(15, 4))  
     for i in range(len(velocities_x)):
@@ -37,6 +43,7 @@ def plot_velocity_x(time_steps, velocities_x):
     plt.grid(True)
     plt.show()
 
+# 按时间绘制各智能体的竖直速度分量。
 def plot_velocity_y(time_steps, velocities_y):
     plt.figure(figsize=(15, 4))  
     for i in range(len(velocities_y)):
@@ -51,6 +58,7 @@ def plot_velocity_y(time_steps, velocities_y):
     plt.grid(True)
     plt.show()
 
+# 在三个子图中展示速率、水平分量和竖直分量；输入按智能体分组。
 def plot_velocities(velocities_magnitude, velocities_x, velocities_y):
     time_steps = range(len(velocities_magnitude[0]))
     fig, axs = plt.subplots(3, 1, figsize=(10, 10))
@@ -104,11 +112,14 @@ if __name__ == '__main__':
                            fc1=128, fc2=128, alpha=0.0001, beta=0.003, scenario='UAV_Round_up',
                            chkpt_dir='tmp/maddpg/')
     
+    # 网络尺寸及场景目录需要与已有权重一致。
     maddpg_agents.load_checkpoint()
     print('---- Evaluating ----')
 
     obs = env.reset()
 
+    # 动画帧回调：先记录当前速度，再执行策略、推进环境并绘制新状态。
+    # 任一终止标记为真时停止动画；返回空列表，当前动画未启用 blit。
     def update(frame):
         global obs,velocities_magnitude,velocities_x,velocities_y
 
@@ -121,6 +132,7 @@ if __name__ == '__main__':
             velocities_x[i].append(v_x)
             velocities_y[i].append(v_y)
 
+        # 评估关闭探索噪声；本脚本 total_steps 保持为零，不影响确定性策略动作。
         actions = maddpg_agents.choose_action(obs, total_steps, evaluate=True)
         obs_, _, dones = env.step(actions)
         env.render_anime(frame)
@@ -148,5 +160,6 @@ if __name__ == '__main__':
     total_steps = 0
 
     fig = plt.figure()
+    # 最多调度 10000 帧，20 毫秒是显示调度间隔，物理步长由环境单独决定。
     ani = animation.FuncAnimation(fig, update, frames=10000, interval=20)
     plt.show()

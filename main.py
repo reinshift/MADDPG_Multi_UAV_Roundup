@@ -1,3 +1,6 @@
+# 训练与评估入口；当前 evaluate=True，默认读取已有模型进行评估。
+# 本文件注释描述当前实现；参数限制与特殊行为以具体代码为准。
+
 import numpy as np
 from maddpg import MADDPG
 from sim_env import UAVEnv
@@ -10,10 +13,12 @@ import warnings
 from PIL import Image
 warnings.filterwarnings('ignore')
 
+# 按智能体顺序展平并拼接局部观测，构成 Critic 使用的一维联合状态。
 def obs_list_to_state_vector(obs):
     state = np.hstack([np.ravel(o) for o in obs])
     return state
 
+# 将环境返回的 RGBA 像素数组转换为 RGB 后写入 filename；父目录由调用方创建。
 def save_image(env_render, filename):
     # Convert the RGBA buffer to an RGB image
     image = Image.fromarray(env_render, 'RGBA')  # Use 'RGBA' mode since the buffer includes transparency
@@ -29,6 +34,7 @@ if __name__ == '__main__':
     actor_dims = []
     for agent_id in env.observation_space.keys():
         actor_dims.append(env.observation_space[agent_id].shape[0])
+    # 联合状态包含全部局部观测，默认长度为 26*3+23=101。
     critic_dims = sum(actor_dims)
 
     # action space is a list of arrays, assume each agent has same action space
@@ -47,6 +53,7 @@ if __name__ == '__main__':
     total_steps = 0
     score_history = []
     target_score_history = []
+    # 训练时设为 False；评估模式加载权重、禁用探索并跳过网络学习。
     evaluate = True
     best_score = -30
 
@@ -78,15 +85,18 @@ if __name__ == '__main__':
             state = obs_list_to_state_vector(obs)
             state_ = obs_list_to_state_vector(obs_)
 
+            # 计数从零开始且在步末增加，因此此条件允许执行编号 0 到 MAX_STEPS 的步骤。
             if episode_step >= MAX_STEPS:
                 dones = [True]*n_agents
 
+            # 当前实现评估时也写入回放缓存；训练每 10 个全局步尝试更新一次。
             memory.store_transition(obs, state, actions, rewards, obs_, state_, dones)
 
             if total_steps % 10 == 0 and not evaluate:
                 maddpg_agents.learn(memory,total_steps)
 
             obs = obs_
+            # 这里的 0:2 只累计索引 0、1 的奖励，不包含第三架追捕无人机。
             score += sum(rewards[0:2])
             score_target += rewards[-1]
             total_steps += 1
@@ -94,6 +104,7 @@ if __name__ == '__main__':
 
         score_history.append(score)
         target_score_history.append(score_target)
+        # 最近最多 100 个回合的平均分用于进度输出和训练模型择优保存。
         avg_score = np.mean(score_history[-100:])
         avg_target_score = np.mean(target_score_history[-100:])
         if not evaluate:
@@ -105,6 +116,7 @@ if __name__ == '__main__':
             print('episode', i, 'average score {:.1f}'.format(avg_score),'; average target score {:.1f}'.format(avg_target_score))
     
     # save data
+    # 每次运行将整条回合分数序列作为一行保存；文件已存在时追加。
     file_name = 'score_history.csv'
     if not os.path.exists(file_name):
         pd.DataFrame([score_history]).to_csv(file_name, header=False, index=False)
